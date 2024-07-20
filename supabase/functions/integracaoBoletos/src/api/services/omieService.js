@@ -34,7 +34,7 @@ export const processClientes = async (boletosData) => {
     }
   }
 
-  await sendStatusEmail(successList, errorList);
+ // await sendStatusEmail(successList, errorList);
 
   return { successList, errorList };
 };

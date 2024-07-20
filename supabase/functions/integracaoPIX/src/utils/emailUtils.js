@@ -51,8 +51,8 @@ export const sendStatusEmail = async (successList, errorList) => {
       },
       body: JSON.stringify({
         sender: {
-          name: "AC Tech Informa",
-          email: "ac.minhavitrine@gmail.com"
+          name: "Financeiro Informa",
+          email: "financeiro@connectfibrape.com.br"
         },
         to: [
           {

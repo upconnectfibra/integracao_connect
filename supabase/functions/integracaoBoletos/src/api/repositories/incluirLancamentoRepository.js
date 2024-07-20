@@ -21,10 +21,10 @@ export const incluirLancamento = async (cCodIntLanc, dDtLanc, nValorLanc, nCodCl
         nValorLanc,
       },
       detalhes: {
-        cCodCateg: '1.01.96',
-        cTipo: 'PIX',
+        cCodCateg: '1.01.99',
+        cTipo: 'BOL',
         nCodCliente,
-        cObs: 'Pagamento com transferências no PIX',
+        cObs: 'Liquidação Boleto Internet',
       },
     }],
   };

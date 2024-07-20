@@ -22,7 +22,7 @@ export const sendStatusEmail = async (successList, errorList) => {
     `).join('');
 
   const emailBody = `
-      <h1>Status do Processamento do PIX</h1>
+      <h1>Status do Processamento de Pagamentos no Boleto</h1>
       <h2>Registros Processados com Sucesso</h2>
       <table border="1">
         <tr>
@@ -58,7 +58,7 @@ export const sendStatusEmail = async (successList, errorList) => {
     },
     body: JSON.stringify({
       sender: {
-        name: "AC Tech Informa",
+        name: "Financeito Informa",
         email: "financeiro@connectfibrape.com.br"
       },
       to: [
