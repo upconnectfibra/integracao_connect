@@ -1,11 +1,12 @@
-// src/api/repositories/consultarClienteRepository.js
 import { config } from '../../config.js';
 import { delay } from '../utils/commonUtils.js';
 
-export const consultarCliente = async (codigoClienteIntegracao) => {
-  await delay(10000); // Delay de 10 segundos
-  const urlOmie = `${config.omie.apiUrl}/geral/clientes/`;
+const MAX_RETRIES = 5;
+const RETRY_DELAY = 5000; // 5 segundos
 
+const consultarClienteRequest = async (codigoClienteIntegracao) => {
+  const urlOmie = `${config.omie.apiUrl}/geral/clientes/`;
+  
   const payload = {
     call: "ConsultarCliente",
     app_key: config.omie.appKey,
@@ -14,7 +15,7 @@ export const consultarCliente = async (codigoClienteIntegracao) => {
       codigo_cliente_integracao: codigoClienteIntegracao
     }]
   };
-  
+
   console.log('Payload para consultarCliente:', JSON.stringify(payload, null, 2));
   
   const response = await fetch(urlOmie, {
@@ -25,18 +26,34 @@ export const consultarCliente = async (codigoClienteIntegracao) => {
     body: JSON.stringify(payload),
   });
 
-  const data = await response.json();
-
   if (!response.ok) {
-    if (data.faultstring.includes("Cliente não cadastrado para o Código [0]")) {
-      console.log("Cliente não cadastrado, chamando API IncluirCliente...");
-      return { data };
-    } else {
-      console.error('Error consulting client:', data.faultstring);
-      await sendErrorEmail(data.faultstring);
-      throw new Error(`Error consulting client: ${data.faultstring}`);
-    }
+    const errorText = await response.text();
+    throw new Error(errorText);
   }
 
-  return data;
+  return await response.json();
+};
+
+export const consultarCliente = async (codigoClienteIntegracao) => {
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      const data = await consultarClienteRequest(codigoClienteIntegracao);
+      
+      if (data.faultstring && data.faultstring.includes("Cliente não cadastrado para o Código [0]")) {
+        console.log("Cliente não cadastrado, chamando API IncluirCliente...");
+        return { data };
+      }
+
+      return data;
+    } catch (error) {
+      if (attempt < MAX_RETRIES) {
+        console.warn(`Attempt ${attempt} failed: ${error.message}. Retrying in ${RETRY_DELAY}ms...`);
+        await delay(RETRY_DELAY * attempt); // Exponential backoff
+      } else {
+        console.error('Max retries reached. Error consulting client:', error.message);
+        await sendErrorEmail(error.message);
+        throw new Error(`Error consulting client: ${error.message}`);
+      }
+    }
+  }
 };

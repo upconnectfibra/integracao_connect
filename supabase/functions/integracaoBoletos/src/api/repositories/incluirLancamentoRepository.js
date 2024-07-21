@@ -6,9 +6,10 @@ const omieHeaders = {
   'Content-Type': 'application/json',
 };
 
-export const incluirLancamento = async (cCodIntLanc, dDtLanc, nValorLanc, nCodCliente) => {
-  await delay(10000); // Delay de 10 segundos
+const MAX_RETRIES = 5;
+const RETRY_DELAY = 1000; // 1 segundo
 
+const incluirLancamentoRequest = async (cCodIntLanc, dDtLanc, nValorLanc, nCodCliente) => {
   const payload = {
     call: 'IncluirLancCC',
     app_key: config.omie.appKey,
@@ -37,11 +38,29 @@ export const incluirLancamento = async (cCodIntLanc, dDtLanc, nValorLanc, nCodCl
     body: JSON.stringify(payload),
   });
 
-  const data = await response.json();
-
   if (!response.ok) {
-    throw new Error(`Error including transaction: ${data.faultstring || response.statusText}`);
+    const errorText = await response.text();
+    throw new Error(errorText);
   }
 
-  return data;
+  return await response.json();
+};
+
+export const incluirLancamento = async (cCodIntLanc, dDtLanc, nValorLanc, nCodCliente) => {
+  await delay(10000); // Delay de 10 segundos
+
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      const data = await incluirLancamentoRequest(cCodIntLanc, dDtLanc, nValorLanc, nCodCliente);
+      return data;
+    } catch (error) {
+      if (attempt < MAX_RETRIES) {
+        console.warn(`Attempt ${attempt} to include transaction failed: ${error.message}. Retrying in ${RETRY_DELAY}ms...`);
+        await delay(RETRY_DELAY * attempt); // Exponential backoff
+      } else {
+        console.error('Max retries reached. Error including transaction:', error.message);
+        throw new Error(`Error including transaction: ${error.message}`);
+      }
+    }
+  }
 };

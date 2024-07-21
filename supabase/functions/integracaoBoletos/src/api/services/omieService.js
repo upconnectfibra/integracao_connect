@@ -1,16 +1,14 @@
-// src/api/services/omieService.js
 import { decodeUnicode, sanitizeString, adjustStringLength, removeAccents } from '../utils/stringUtils.js';
 import { consultarCliente } from '../repositories/consultarClienteRepository.js';
 import { incluirCliente } from '../repositories/incluirClienteRepository.js';
 import { incluirLancamento } from '../repositories/incluirLancamentoRepository.js';
 import { formatDateToDDMMYYYY } from '../utils/dateUtils.js';
-import { sendStatusEmail } from '../utils/emailUtils.js';
 
 export const processClientes = async (boletosData) => {
   const successList = [];
   const errorList = [];
   
-  for (const boleto of boletosData) {
+  const processBoleto = async (boleto) => {
     const decodedString = decodeUnicode(boleto.nomeSacadoCobranca);
     const sanitizedString = sanitizeString(decodedString);
     const codigoClienteIntegracao = adjustStringLength(sanitizedString, 15);
@@ -32,9 +30,9 @@ export const processClientes = async (boletosData) => {
       console.error('Error processing client or transaction:', error);
       errorList.push({ numeroTituloCedenteCobranca: boleto.numeroTituloCedenteCobranca, nomeSacadoCobranca: boleto.nomeSacadoCobranca, valorAtualTituloCobranca: boleto.valorAtualTituloCobranca, error: error.message });
     }
-  }
+  };
 
- // await sendStatusEmail(successList, errorList);
+  await Promise.all(boletosData.map(processBoleto));
 
   return { successList, errorList };
 };
