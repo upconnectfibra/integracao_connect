@@ -1,9 +1,11 @@
 // src/api/repositories/listarBoletosRepository.js
 import { config } from '../../config.js';
+import { getFormattedDateYesterday } from '../utils/dateUtils.js';
 
-export const listarBoletos = async (token, formattedDate) => {
+export const listarBoletos = async (token) => {
   const urlBB = config.hosts.bbUrl;
   const gw_app_key = config.credencialBB.gw_app_key;
+  const formattedDate = getFormattedDateYesterday();
   const listarBoletosCall = `${urlBB}/cobrancas/v2/boletos?gw-app-key=${gw_app_key}&indicadorSituacao=B&agenciaBeneficiario=1836&contaBeneficiario=60612&dataInicioMovimento=${formattedDate}&dataFimMovimento=${formattedDate}&codigoEstadoTituloCobranca=6`;
     
   console.log('listarBoletosCall URL:', listarBoletosCall);

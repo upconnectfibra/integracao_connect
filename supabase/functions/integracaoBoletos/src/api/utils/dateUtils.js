@@ -13,6 +13,12 @@ export const formatDateToBB = (date) => {
   return `${day}.${month}.${year}`;
 };
 
+export const getFormattedDateYesterday = () => {
+  const date = new Date();
+  date.setDate(date.getDate() - 1);
+  return formatDateToBB(date);
+};
+
 // Função para obter a data atual formatada
 export const getCurrentDateFormatted = () => {
   const currentDate = new Date();

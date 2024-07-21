@@ -1,4 +1,3 @@
-// src/api/repositories/incluirLancamentoRepository.js
 import { config } from '../../config.js';
 import { delay } from '../utils/commonUtils.js';
 
@@ -7,7 +6,7 @@ const omieHeaders = {
 };
 
 const MAX_RETRIES = 5;
-const RETRY_DELAY = 1000; // 1 segundo
+const INITIAL_RETRY_DELAY = 10000; // 10 segundos
 
 const incluirLancamentoRequest = async (cCodIntLanc, dDtLanc, nValorLanc, nCodCliente) => {
   const payload = {
@@ -47,16 +46,15 @@ const incluirLancamentoRequest = async (cCodIntLanc, dDtLanc, nValorLanc, nCodCl
 };
 
 export const incluirLancamento = async (cCodIntLanc, dDtLanc, nValorLanc, nCodCliente) => {
-  await delay(10000); // Delay de 10 segundos
-
   for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
     try {
       const data = await incluirLancamentoRequest(cCodIntLanc, dDtLanc, nValorLanc, nCodCliente);
       return data;
     } catch (error) {
       if (attempt < MAX_RETRIES) {
-        console.warn(`Attempt ${attempt} to include transaction failed: ${error.message}. Retrying in ${RETRY_DELAY}ms...`);
-        await delay(RETRY_DELAY * attempt); // Exponential backoff
+        const retryDelay = INITIAL_RETRY_DELAY * attempt; // Exponential backoff
+        console.warn(`Attempt ${attempt} to include transaction failed: ${error.message}. Retrying in ${retryDelay}ms...`);
+        await delay(retryDelay);
       } else {
         console.error('Max retries reached. Error including transaction:', error.message);
         throw new Error(`Error including transaction: ${error.message}`);
