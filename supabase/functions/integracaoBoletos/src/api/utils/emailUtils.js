@@ -1,50 +1,32 @@
 // src/api/utils/emailUtils.js
+import { buscarBoletosProcessadosHoje } from '../repositories/boletosRepository.js';
 import { getCurrentDateFormatted } from './dateUtils.js';
 
-export const sendStatusEmail = async (successList, errorList) => {
-  const successTable = successList.map((item) => `
-      <tr>
-        <td>${getCurrentDateFormatted()}</td>  
-        <td>${item.numeroTituloCedenteCobranca}</td>
-        <td>${item.nomeSacadoCobranca}</td>
-        <td>${item.valorAtualTituloCobranca}</td>
-      </tr>
-    `).join('');
+export const sendStatusEmail = async () => {
+  const successList = await buscarBoletosProcessadosHoje();
 
-  const errorTable = errorList.map((item) => `
-      <tr>
-        <td>${getCurrentDateFormatted()}</td>
-        <td>${item.numeroTituloCedenteCobranca}</td>
-        <td>${item.nomeSacadoCobranca}</td>
-        <td>${item.valorAtualTituloCobranca}</td>
-        <td>${item.error}</td>
-      </tr>
-    `).join('');
+  const successTable = successList.map((item) => `
+    <tr>
+      <td>${getCurrentDateFormatted()}</td>
+      <td>${item.dados_boleto.numeroTituloCedenteCobranca}</td>
+      <td>${item.dados_boleto.nomeSacadoCobranca}</td>
+      <td>${item.dados_boleto.valorAtualTituloCobranca}</td>
+    </tr>
+  `).join('');
 
   const emailBody = `
-      <h1>Status do Processamento de Pagamentos no Boleto</h1>
-      <h2>Registros Processados com Sucesso</h2>
-      <table border="1">
-        <tr>
-          <th>Data Processamento</th>
-          <th>ID</th>
-          <th>Nome</th>
-          <th>Valor</th>          
-        </tr>
-        ${successTable}
-      </table>
-      <h2>Registros com Erro</h2>
-      <table border="1">
-        <tr>
-          <th>Data Processamento</th>
-          <th>ID</th>
-          <th>Nome</th>
-          <th>Valor</th>
-          <th>Erro</th>
-        </tr>
-        ${errorTable}
-      </table>
-    `;
+    <h1>Status do Processamento de Pagamentos no Boleto</h1>
+    <h2>Registros Processados com Sucesso</h2>
+    <table border="1">
+      <tr>
+        <th>Data Processamento</th>
+        <th>ID</th>
+        <th>Nome</th>
+        <th>Valor</th>          
+      </tr>
+      ${successTable}
+    </table>
+  `;
 
   console.log('Enviando e-mail com status do processamento...');
   console.log(emailBody);

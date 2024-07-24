@@ -1,4 +1,3 @@
-// src/config.js
 const config = {
   hosts: {
     bbUrl: 'https://api.bb.com.br',
@@ -13,6 +12,8 @@ const config = {
   supabase: {
     pfxUrl: 'https://rjcmhliurwqxzmsfvroh.supabase.co/storage/v1/object/sign/documentos_connect/certificado_digital/Up_Connect_1234.pfx?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJkb2N1bWVudG9zX2Nvbm5lY3QvY2VydGlmaWNhZG9fZGlnaXRhbC9VcF9Db25uZWN0XzEyMzQucGZ4IiwiaWF0IjoxNzIwNDU4NTI5LCJleHAiOjE3NTE5OTQ1Mjl9.ZapfiM9BoRcrQKRkxbAJbVkQDfxPoazfh_TEQUix7OM&t=2024-07-08T17%3A08%3A49.777Z',
     pfxPassword: '1234',
+    url: 'https://rjcmhliurwqxzmsfvroh.supabase.co',
+    key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJqY21obGl1cndxeHptc2Z2cm9oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjAyMDEzNTUsImV4cCI6MjAzNTc3NzM1NX0.PjS384RX4fjLfMBqi222HYHNTUQ85qJlquYEQGA8d0k',
   },
   pix: {
     apiUrl: `/pix/v2/pix?gw-app-key=8b2456c902e61d7a28a02af041fe18f2&paginacao.paginaAtual=0&paginacao.itensPorPagina=100&inicio=${getFormattedDateYesterday()}&fim=${getFormattedDateToday()}`,

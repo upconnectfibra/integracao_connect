@@ -1,4 +1,3 @@
-// src/api/repositories/detalheBoletosRepository.js
 import { config } from '../../config.js';
 
 const fetchBoletoDetails = async (token, numeroBoletoBB) => {
@@ -26,7 +25,8 @@ export const listaDetalheBoletos = async (token, boletos) => {
   const detalhesBoletos = await Promise.all(
     boletos.map(async (boleto) => {
       const numeroBoletoBB = boleto.numeroBoletoBB;
-      return await fetchBoletoDetails(token, numeroBoletoBB);
+      const detalhes = await fetchBoletoDetails(token, numeroBoletoBB);
+      return { ...detalhes, numeroBoletoBB }; // Adicionar numeroBoletoBB aos detalhes
     })
   );
   console.log(detalhesBoletos);

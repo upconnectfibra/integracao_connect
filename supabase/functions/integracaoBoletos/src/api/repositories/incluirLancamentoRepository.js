@@ -1,3 +1,4 @@
+//src/api/repositories/incluirLancamentoRepository.js
 import { config } from '../../config.js';
 import { delay } from '../utils/commonUtils.js';
 
@@ -6,7 +7,8 @@ const omieHeaders = {
 };
 
 const MAX_RETRIES = 5;
-const INITIAL_RETRY_DELAY = 10000; // 10 segundos
+const INITIAL_RETRY_DELAY = 15000; // 10 segundos
+const MISUSE_API_PROCESS_RETRY_DELAY = 300000; // 300 segundos (5 minutos)
 
 const incluirLancamentoRequest = async (cCodIntLanc, dDtLanc, nValorLanc, nCodCliente) => {
   const payload = {
@@ -42,7 +44,14 @@ const incluirLancamentoRequest = async (cCodIntLanc, dDtLanc, nValorLanc, nCodCl
     throw new Error(errorText);
   }
 
-  return await response.json();
+  const data = await response.json();
+
+  // Verifique se há um faultcode específico na resposta
+  if (data.faultcode && (data.faultcode === 'SOAP-ENV:Client-102' || data.faultcode === 'MISUSE_API_PROCESS')) {
+    throw new Error(`${data.faultcode}: ${data.faultstring}`);
+  }
+
+  return data;
 };
 
 export const incluirLancamento = async (cCodIntLanc, dDtLanc, nValorLanc, nCodCliente) => {
@@ -51,8 +60,13 @@ export const incluirLancamento = async (cCodIntLanc, dDtLanc, nValorLanc, nCodCl
       const data = await incluirLancamentoRequest(cCodIntLanc, dDtLanc, nValorLanc, nCodCliente);
       return data;
     } catch (error) {
+      if (error.message.includes('SOAP-ENV:Client-102')) {
+        // Lançar o erro diretamente sem retry para SOAP-ENV:Client-102
+        throw error;
+      }
+
       if (attempt < MAX_RETRIES) {
-        const retryDelay = INITIAL_RETRY_DELAY * attempt; // Exponential backoff
+        const retryDelay = error.message.includes('MISUSE_API_PROCESS') ? MISUSE_API_PROCESS_RETRY_DELAY : INITIAL_RETRY_DELAY * attempt; // Exponential backoff or specific delay for MISUSE_API_PROCESS
         console.warn(`Attempt ${attempt} to include transaction failed: ${error.message}. Retrying in ${retryDelay}ms...`);
         await delay(retryDelay);
       } else {

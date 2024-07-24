@@ -1,4 +1,4 @@
-// src/api/repositories/listarBoletosRepository.js
+//src/api/repositories/listarBoletosRepository.js
 import { config } from '../../config.js';
 import { getFormattedDateYesterday } from '../utils/dateUtils.js';
 
@@ -26,5 +26,5 @@ export const listarBoletos = async (token) => {
   }
 
   const data = await response.json();
-  return data;
+  return data.boletos; // Retornar diretamente os boletos
 };

@@ -1,7 +1,8 @@
+// src/index.js
 import { sendStatusEmail } from './src/api/utils/emailUtils.js';
 import { config } from './src/config.js';
 import { fetchBoletos } from './src/api/services/boletosService.js';
-import { processClientes } from './src/api/services/omieService.js';
+import { processClientes, processarFilaDeBoletos } from './src/api/services/omieService.js';
 import { getOAuthToken } from './src/api/utils/oauthUtils.js';
 
 Deno.serve(async (req) => {
@@ -10,7 +11,11 @@ Deno.serve(async (req) => {
       headers: { "Content-Type": "application/json" },
       status: 200,
     });
-//processamento de boletos em segundo plano
+
+    // Processar boletos pendentes antes de qualquer coisa
+    await processarFilaDeBoletos();
+
+    // Processamento de boletos em segundo plano
     (async () => {
       try {
         const token = await getOAuthToken();
@@ -24,7 +29,7 @@ Deno.serve(async (req) => {
         const { successList, errorList } = await processClientes(boletosData);
 
         // Enviar email com o resultado
-        await sendStatusEmail(successList, errorList);
+        await sendStatusEmail();
       } catch (error) {
         console.error('Error in background processing:', error.message);
         await sendStatusEmail([], [{ error: error.message }]);

@@ -7,7 +7,8 @@ const omieHeaders = {
 };
 
 const MAX_RETRIES = 5;
-const INITIAL_RETRY_DELAY = 10000; // 10 segundos
+const INITIAL_RETRY_DELAY = 15000; // 15 segundos
+const MISUSE_API_PROCESS_RETRY_DELAY = 300000; // 300 segundos (5 minutos)
 
 const consultarClienteRequest = async (codigoClienteIntegracao) => {
   const urlOmie = `${config.omie.apiUrl}/geral/clientes/`;
@@ -42,6 +43,11 @@ const consultarClienteRequest = async (codigoClienteIntegracao) => {
     throw new Error(decodedError);
   }
 
+  // Verifique se há um faultcode específico na resposta
+  if (data.faultcode && data.faultcode === 'MISUSE_API_PROCESS') {
+    throw new Error(`${data.faultcode}: ${data.faultstring}`);
+  }
+
   return data;
 };
 
@@ -54,7 +60,7 @@ export const consultarCliente = async (codigoClienteIntegracao) => {
         throw error; // Cliente não cadastrado, siga o fluxo para incluir o cliente
       }
       if (attempt < MAX_RETRIES) {
-        const retryDelay = INITIAL_RETRY_DELAY * attempt; // Exponential backoff
+        const retryDelay = error.message.includes('MISUSE_API_PROCESS') ? MISUSE_API_PROCESS_RETRY_DELAY : INITIAL_RETRY_DELAY * attempt; // Exponential backoff or specific delay for MISUSE_API_PROCESS
         console.warn(`Attempt ${attempt} failed: ${error.message}. Retrying in ${retryDelay}ms...`);
         await delay(retryDelay);
       } else {
