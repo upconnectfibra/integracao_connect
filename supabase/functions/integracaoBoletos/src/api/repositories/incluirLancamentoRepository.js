@@ -7,7 +7,7 @@ const omieHeaders = {
 };
 
 const MAX_RETRIES = 5;
-const INITIAL_RETRY_DELAY = 15000; // 10 segundos
+const INITIAL_RETRY_DELAY = 20000; // 20 segundos
 const MISUSE_API_PROCESS_RETRY_DELAY = 300000; // 300 segundos (5 minutos)
 
 const incluirLancamentoRequest = async (cCodIntLanc, dDtLanc, nValorLanc, nCodCliente) => {

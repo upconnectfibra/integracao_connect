@@ -7,8 +7,8 @@ const omieHeaders = {
 };
 
 const MAX_RETRIES = 5;
-const INITIAL_RETRY_DELAY = 15000; // 15 segundos
-const MISUSE_API_PROCESS_RETRY_DELAY = 300000; // 300 segundos (5 minutos)
+const INITIAL_RETRY_DELAY = 20000; // 15 segundos
+const MISUSE_API_PROCESS_RETRY_DELAY = 1800000; // 30 minutos
 
 const consultarClienteRequest = async (codigoClienteIntegracao) => {
   const urlOmie = `${config.omie.apiUrl}/geral/clientes/`;

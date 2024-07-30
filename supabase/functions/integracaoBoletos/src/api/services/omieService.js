@@ -8,7 +8,7 @@ import { delay } from '../utils/commonUtils.js';
 import { buscarBoletosPendentes, atualizarStatusBoleto, buscarBoletoPorNumero } from '../repositories/boletosRepository.js';
 
 const MAX_RETRIES = 5;
-const INITIAL_RETRY_DELAY = 10000; // 10 segundos
+const INITIAL_RETRY_DELAY = 15000; // 15 segundos
 const MISUSE_API_PROCESS_RETRY_DELAY = 1800000; // 300 segundos (5 minutos)
 
 const processBoleto = async (boleto, successList, errorList) => {
