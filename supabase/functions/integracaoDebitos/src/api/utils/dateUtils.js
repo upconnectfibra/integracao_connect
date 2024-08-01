@@ -14,7 +14,7 @@ export const formatDateToBB = (date) => {
 };
 
 export const getFormattedDateYesterday = () => {
-  const date = new Date('2024-07-01');
+  const date = new Date('2024-07-18');
   /*const date = new Date();
   date.setDate(date.getDate() - 1);*/
   return formatDateToBB(date);

@@ -30,10 +30,10 @@ Deno.serve(async (req) => {
         const { successList, errorList } = await processClientes(boletosData);
 
         // Enviar email com o resultado
-      //  await sendStatusEmail();
+        await sendStatusEmail();
       } catch (error) {
         console.error('Error in background processing:', error.message);
-        //await sendStatusEmail([], [{ error: error.message }]);
+        await sendStatusEmail([], [{ error: error.message }]);
       }
     })();
 

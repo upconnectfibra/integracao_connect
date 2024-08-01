@@ -3,6 +3,7 @@ import { listarBoletos } from '../repositories/listarBoletosRepository.js';
 import { listaDetalheBoletos } from '../repositories/detalheBoletosRepository.js';
 import { formatDateToBB } from '../utils/dateUtils.js';
 import { inserirBoletoNaFila, buscarBoletoPorNumero } from '../repositories/boletosRepository.js';
+import { processBoleto } from './omieService.js';
 
 export const fetchBoletos = async (token) => {
   try {
@@ -24,7 +25,7 @@ export const fetchBoletos = async (token) => {
 
       if (existingBoleto.length > 0) {
         if (existingBoleto[0].status === 'pendente') {
-          await processarBoleto(boleto);  // Processar boletos pendentes
+          await processBoleto(boleto);  // Processar boletos pendentes
         }
         // Se o status for 'processado', não fazer nada
       } else {

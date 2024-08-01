@@ -1,8 +1,8 @@
-//src/api/repositories/listarBoletosRepository.js
+//src/api/repositories/listarExtratoPagamentoRepository.js
 import { config } from '../../config.js';
 import { getFormattedDateYesterday } from '../utils/dateUtils.js';
 
-export const listarBoletos = async (token) => {
+export const listarExtratoPagamento = async (token) => {
   const urlBB = config.hosts.bbUrl;
   const gw_app_key = config.credencialBB.gw_app_key;
   const agencia = config.credencialBB.agencia;
@@ -20,7 +20,7 @@ export const listarBoletos = async (token) => {
     },
   });
 
-   console.log('listarBoletos response status:', response.status);
+   console.log('listarExtratoPagamento response status:', response.status);
   if (!response.ok) {
     const errorText = await response.text();
     console.error('Failed to list boletos:', errorText);
@@ -28,5 +28,8 @@ export const listarBoletos = async (token) => {
   }
 
   const data = await response.json();
-  return data.boletos; // Retornar diretamente os boletos
+  // Filtrando os registros com "indicadorSinalLancamento": "D"
+  const filteredData = data.listaLancamento.filter(lancamento => lancamento.indicadorSinalLancamento === 'D');
+
+  return filteredData; // Retornar os registros filtrados
 };
